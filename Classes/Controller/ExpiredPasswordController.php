@@ -30,7 +30,7 @@
  * @copyright Copyright belongs to the respective authors
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class Tx_FeuserPasswordExpiration_Controller_ExpiredPasswordController extends Tx_Extbase_MVC_Controller_ActionController {
+class Tx_FeuserPasswordexpiration_Controller_ExpiredPasswordController extends Tx_Extbase_MVC_Controller_ActionController {
 	/**
 	 * @var Tx_FeuserAdministration_Domain_Repository_FrontendUserRepository
 	 */
@@ -42,7 +42,7 @@ class Tx_FeuserPasswordExpiration_Controller_ExpiredPasswordController extends T
 	 * @return void
 	 */
 	protected function initializeAction() {
-		$this->frontendUserRepository = $this->objectManager->get ( 'Tx_FeuserAdministration_Domain_Repository_FrontendUserRepository' );
+		$this->frontendUserRepository = $this->objectManager->get ( 'Tx_FeuserPasswordexpiration_Domain_Repository_FrontendUserRepository' );
 	}
 
 	/**

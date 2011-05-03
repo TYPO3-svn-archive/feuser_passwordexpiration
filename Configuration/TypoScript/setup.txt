@@ -1,9 +1,9 @@
 config.tx_extbase.persistence.classes {
-    Tx_FeuserPasswordExpiration_Domain_Model_FrontendUser {
+    Tx_FeuserPasswordexpiration_Domain_Model_FrontendUser {
         mapping {
             tableName = fe_users
             columns {
-            	lastPasswordChange.mapOnProperty = lastPasswordChange
+            	tx_feuserpasswordexpiration_lastPasswordChange.mapOnProperty = lastPasswordChange
             }
         }
     }

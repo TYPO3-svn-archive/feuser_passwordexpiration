@@ -29,6 +29,20 @@
  * @copyright Copyright belongs to the respective authors
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class Tx_FeuserPasswordExpiration_Domain_Repository_FrontendUserRepository extends Tx_Extbase_Domain_Repository_FrontendUserRepository {
+class Tx_FeuserPasswordexpiration_Domain_Repository_FrontendUserRepository extends Tx_Extbase_Domain_Repository_FrontendUserRepository {
+	/**
+	 * Removes frontend users who didn't change their passwords since given timestamp
+	 *
+	 * @param integer $duration
+	 */
+	public function findUsersWithExpiredPasswords($expirationDurationDuration) {
+		$query = $this->createQuery ();
+		//$query->getQuerySettings()->setRespectStoragePage(FALSE);
+		
+		$expirationDate = time() - $expirationDuration;
+		
+		$query->matching ($query->lessThan ( 'tx_feuserpasswordexpiration_lastPasswordChange', $expirationDate ));
 
+		return $query->execute();
+	}
 }

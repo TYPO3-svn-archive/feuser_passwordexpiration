@@ -30,7 +30,7 @@
  * @copyright Copyright belongs to the respective authors
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class Tx_FeuserPasswordExpiration_Domain_Model_FrontendUser extends Tx_Extbase_Domain_Model_FrontendUser {
+class Tx_FeuserPasswordexpiration_Domain_Model_FrontendUser extends Tx_Extbase_Domain_Model_FrontendUser {
 
 	/**
 	 * @var integer

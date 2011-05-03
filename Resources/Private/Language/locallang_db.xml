@@ -6,6 +6,8 @@
 	</meta>
 	<data type="array">
 		<languageKey index="default" type="array">
+			<label index="schedulerTask.deleteUsersWithExpiredPasswords.name">Delete users with expired passwords</label>
+			<label index="schedulerTask.deleteUsersWithExpiredPasswords.description">Deletes all frontend users who didn't change their passwords since 180 days</label>
 		</languageKey>
 	</data>
 </T3locallang>
