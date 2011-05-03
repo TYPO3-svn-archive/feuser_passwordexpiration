@@ -24,44 +24,13 @@
 ***************************************************************/
 
 /**
- * Controller for the FrontendUser object
+ * Extends Default Frontend User
  *
  * @version $Id$
  * @copyright Copyright belongs to the respective authors
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
-class Tx_FeuserPasswordexpiration_Controller_ExpiredPasswordController extends Tx_Extbase_MVC_Controller_ActionController {
-	/**
-	 * @var Tx_FeuserAdministration_Domain_Repository_FrontendUserRepository
-	 */
-	protected $frontendUserRepository;
-
-	/**
-	 * Initializes the current action
-	 *
-	 * @return void
-	 */
-	protected function initializeAction() {
-		$this->frontendUserRepository = $this->objectManager->get ( 'Tx_FeuserPasswordexpiration_Domain_Repository_FrontendUserRepository' );
-	}
-
-	/**
-	 * Displays form to change password if password expires
-	 */
-	public function indexAction() {
-		$this->view->assign ( 'username', $this->getCurrentUser()->getUsername() );
-	}
-
-	/**
-	 * Gives logged in user
-	 * 
-	 * @return Tx_FeuserAdministration_Domain_Model_FrontendUser
-	 */
-	protected function getCurrentUser() {
-		if (is_null($this->frontendUserRepository->findbyUid($GLOBALS ['TSFE']->fe_user->user))) {
-			throw new Exception("No user logged in.");
-		}
-		return $this->frontendUserRepository->findbyUid($GLOBALS ['TSFE']->fe_user->user ['uid']);
-	}
+class Tx_FeuserPasswordexpiration_Domain_Model_FrontendUserGroup extends Tx_Extbase_Domain_Model_FrontendUserGroup {
 
 }
+?>
