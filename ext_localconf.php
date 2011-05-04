@@ -22,6 +22,5 @@ if (TYPO3_MODE == 'BE') {
 }
 
 // register hook to update lastPasswordChange field
-$GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['tx_feuserregister']['addObserver'][] = 'EXT:feuser_passwordexpiration/Classes/Hooks/UpdateLastPasswordChangeHook.php:UpdateLastPasswordChangeHook->update';
-
+$GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['tx_feuserregister']['addObserver'][] = 'EXT:'.$_EXTKEY.'/Classes/Hooks/UpdateLastPasswordChangeHook.php:tx_FeuserPasswordexpiration_Hooks_UpdateLastPasswordChangeHook';
 ?>

@@ -27,21 +27,31 @@ require_once(t3lib_extMgm::extPath('feuserregister') . 'interfaces/interface.tx_
 
 /**
  * Hook to update lastPasswordChange field in fe_users table on password update
+ * NOTE: Use for this class 'tx' instead of 'Tx' in class name
  */
-class Tx_FeuserPasswordexpiration_Hooks_UpdateLastPasswordChangeHook implements tx_feuserregister_interface_Observer {
+class tx_FeuserPasswordexpiration_Hooks_UpdateLastPasswordChangeHook implements tx_feuserregister_interface_Observer {
 	/**
 	 * update lastPasswordChange of given user
+	 * 
+	 * @param string $event
+	 * @param array $params
+	 * @param tx_feuserregister_interface_Observable $observable
+	 * @return mixed Whether to cancel further processings
 	 */
 	public function update($event, array $params, tx_feuserregister_interface_Observable $observable) {
 
-		if ($event == 'onConfirmSaveSuccess') {
+		if ($event === 'onEditAfterSave') {
 			
 			$objectManager = t3lib_div::makeInstance ( 'Tx_Extbase_Object_ObjectManager' );
 			$frontendUserRepository = $objectManager->get ( 'Tx_FeuserPasswordexpiration_Domain_Repository_FrontendUserRepository' );
 			
-			$user = $frontendUserRepository->findByUid($uid);
+			$frontendUser = $params['feuser'];
+			$user = $frontendUserRepository->findByUid($frontendUser->get('uid'));
 			$user->setLastPasswordChange(time());
 			
+					$persistenceManager = $objectManager->get('Tx_Extbase_Persistence_Manager');
+		$persistenceManager->persistAll();
+
 		}
 
 	}
