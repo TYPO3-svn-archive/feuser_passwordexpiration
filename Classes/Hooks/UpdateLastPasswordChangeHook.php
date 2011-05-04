@@ -49,8 +49,8 @@ class tx_FeuserPasswordexpiration_Hooks_UpdateLastPasswordChangeHook implements 
 			$user = $frontendUserRepository->findByUid($frontendUser->get('uid'));
 			$user->setLastPasswordChange(time());
 			
-					$persistenceManager = $objectManager->get('Tx_Extbase_Persistence_Manager');
-		$persistenceManager->persistAll();
+			$persistenceManager = $objectManager->get('Tx_Extbase_Persistence_Manager');
+			$persistenceManager->persistAll();
 
 		}
 
