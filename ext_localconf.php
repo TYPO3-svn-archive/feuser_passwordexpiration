@@ -3,17 +3,6 @@ if (!defined ('TYPO3_MODE')) {
 	die ('Access denied.');
 }
 
-Tx_Extbase_Utility_Extension::configurePlugin(
-	$_EXTKEY,
-	'Pi1',
-	array(
-		'ExpiredPassword' => 'index'
-	),
-	array(
-		'ExpiredPassword' => 'index'
-	)
-);
-
 if (TYPO3_MODE == 'BE') {
 
 	require_once t3lib_extMgm::extPath($_EXTKEY) . 'Classes/Scheduler/DetectUsersWithExpiredPasswordsTask.php';
