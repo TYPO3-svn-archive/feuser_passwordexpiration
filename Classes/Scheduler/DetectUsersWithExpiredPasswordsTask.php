@@ -24,18 +24,21 @@
 ***************************************************************/
 
 require_once (t3lib_extMgm::extPath ( 'scheduler' ) . 'class.tx_scheduler_task.php');
-/**
- * Defines the duration after which frontend users who didn't change their passwords shold be deleted
- */
-define('EXPIRATION_DURATION', 60 * 60 * 24 * 90);
-/**
- * Defines the usergroup which should be assigned to the frontend user
- */
-define('EXPIRATION_USERGROUP', 21);
+
 /**
  * Frontend users delete task for sheduler
  */
 class Tx_FeuserPasswordexpiration_Scheduler_DetectUsersWithExpiredPasswordsTask extends tx_scheduler_Task {
+	
+	/**
+	 * get additional informations, which will be shown inside the scheduler-BE-modul
+	 *
+	 * @return string
+	 */
+	public function getAdditionalInformation() {
+		return 'Expiration duration: '.$this->expirationDurationForDetection.'; Expiration usergroup: '.$this->expirationUsergroupForDetection;
+	}
+	
 	/**
 	 * deletes all users who didn't change their passwords
 	 */
@@ -46,8 +49,8 @@ class Tx_FeuserPasswordexpiration_Scheduler_DetectUsersWithExpiredPasswordsTask 
 		
 		$frontendUserRepository->updateLastPasswordChangeToCurrentTimestampIfNull();
 		
-		$users = $frontendUserRepository->findUsersWithExpiredPasswords(EXPIRATION_DURATION);
-		$exiprationUserGroup =  $frontendUserGroupRepository->findByUid(EXPIRATION_USERGROUP);
+		$users = $frontendUserRepository->findUsersWithExpiredPasswords($this->expirationDurationForDetection);
+		$exiprationUserGroup =  $frontendUserGroupRepository->findByUid($this->expirationUsergroupForDetection);
 		
 		foreach ($users as $user) {
 			$user->addUsergroup($exiprationUserGroup);

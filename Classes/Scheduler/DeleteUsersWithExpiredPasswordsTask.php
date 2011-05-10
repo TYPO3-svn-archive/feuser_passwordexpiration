@@ -24,14 +24,21 @@
 ***************************************************************/
 
 require_once (t3lib_extMgm::extPath ( 'scheduler' ) . 'class.tx_scheduler_task.php');
-/**
- * Defines the duration after which frontend users who didn't change their passwords shold be deleted
- */
-define('EXPIRATION_DURATION', 60 * 60 * 24 * 180);
+
 /**
  * Frontend users delete task for sheduler
  */
 class Tx_FeuserPasswordexpiration_Scheduler_DeleteUsersWithExpiredPasswordsTask extends tx_scheduler_Task {
+	
+	/**
+	 * get additional informations, which will be shown inside the scheduler-BE-modul
+	 *
+	 * @return string
+	 */
+	public function getAdditionalInformation() {
+		return 'Expiration duration: '.$this->expirationDurationForDeletion;
+	}
+	
 	/**
 	 * deletes all users who didn't change their passwords
 	 */
@@ -42,7 +49,7 @@ class Tx_FeuserPasswordexpiration_Scheduler_DeleteUsersWithExpiredPasswordsTask 
 		// Updates database field of new users
 		$frontendUserRepository->updateLastPasswordChangeToCurrentTimestampIfNull();
 		
-		$usersWithExpiredPasswords = $frontendUserRepository->findUsersWithExpiredPasswords(EXPIRATION_DURATION);
+		$usersWithExpiredPasswords = $frontendUserRepository->findUsersWithExpiredPasswords($this->expirationDurationForDeletion);
 		foreach ($usersWithExpiredPasswords as $user) {
 			$frontendUserRepository->remove($user);
 		}
