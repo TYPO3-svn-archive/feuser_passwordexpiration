@@ -10,7 +10,7 @@
 			<label index="schedulerTask.detectUsersWithExpiredPasswords.description">Adds definied usergoup to users with expired password</label>
 			<label index="schedulerTask.detectUsersWithExpiredPasswords.invalidExpirationUsergroupForDetection">Invalid expiration usergroup.</label>
 			<label index="schedulerTask.deleteUsersWithExpiredPasswords.name">Delete users with expired passwords</label>
-			<label index="schedulerTask.deleteUsersWithExpiredPasswords.description">Deletes all frontend users who didn't change their passwords since 180 days</label>
+			<label index="schedulerTask.deleteUsersWithExpiredPasswords.description">Deletes all frontend users who didn't change their passwords since defined time</label>
 			<label index="schedulerTask.detectUsersWithExpiredPasswords.invalidExpirationDurationForDetection">Invalid expiration duration.</label>
 		</languageKey>
 	</data>
