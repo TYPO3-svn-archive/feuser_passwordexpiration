@@ -26,7 +26,7 @@
 require_once(t3lib_extMgm::extPath('scheduler').'interfaces/interface.tx_scheduler_additionalfieldprovider.php');
 
 /**
- * class to define the additional field 'expirationDurationForDetection' and 'expirationUsergroupForDetection'
+ * class to define the additional field 'expirationDurationForDetection'
  */
 class tx_FeuserPasswordexpiration_Scheduler_DetectUsersWithExpiredPasswordsAdditionalFields implements tx_scheduler_AdditionalFieldProvider {
 	
@@ -48,16 +48,6 @@ class tx_FeuserPasswordexpiration_Scheduler_DetectUsersWithExpiredPasswordsAddit
 			}
 		}
 		
-		if (empty($taskInfo['expirationUsergroupForDetection'])) {
-			if ($parentObject->CMD == 'add') {
-				$taskInfo['expirationUsergroupForDetection'] = '';
-			} elseif($parentObject->CMD == 'edit') {
-				$taskInfo['expirationUsergroupForDetection'] = $task->expirationUsergroupForDetection;
-			} else {
-				$taskInfo['expirationUsergroupForDetection'] = '';
-			}
-		}
-		
 		$additionalFields = array();
 		
 		// Write the code for the field
@@ -66,14 +56,6 @@ class tx_FeuserPasswordexpiration_Scheduler_DetectUsersWithExpiredPasswordsAddit
 		$additionalFields[$fieldID] = array(
 			'code'     => $fieldCode,
 			'label'    => 'Expiration duration (seconds)'
-		);
-		
-		// Write the code for the field
-		$fieldID = 'task_expirationUsergroupForDetection';
-		$fieldCode = '<input type="text" name="tx_scheduler[expirationUsergroupForDetection]" id="' . $fieldID . '" value="' . $taskInfo['expirationUsergroupForDetection'] . '" size="10" />';
-		$additionalFields[$fieldID] = array(
-			'code'     => $fieldCode,
-			'label'    => 'Expiration usergroup (uid)'
 		);
 
 		return $additionalFields;
@@ -85,7 +67,6 @@ class tx_FeuserPasswordexpiration_Scheduler_DetectUsersWithExpiredPasswordsAddit
      */
 	public function saveAdditionalFields(array $submittedData, tx_scheduler_Task $task) {
 		$task->expirationDurationForDetection = (int) $submittedData['expirationDurationForDetection'];
-		$task->expirationUsergroupForDetection = (int) $submittedData['expirationUsergroupForDetection'];
 	}
 	
 	/**
@@ -95,21 +76,14 @@ class tx_FeuserPasswordexpiration_Scheduler_DetectUsersWithExpiredPasswordsAddit
 	 */
 	public function validateAdditionalFields(array &$submittedData, tx_scheduler_Module $parentObject) {
 		$expirationDurationForDetectionIsValid = false;
-		$expirationUsergroupForDetectionIsValid = false;
 
 		if ( t3lib_div::intval_positive( (int) trim($submittedData['expirationDurationForDetection'])) > 0 ) {
 			$expirationDurationForDetectionIsValid = true;
 		} else {
 			$parentObject->addMessage($GLOBALS['LANG']->sL('LLL:EXT:feuser_passwordexpiration/Resources/Private/Language/locallang_db.xml:schedulerTask.detectUsersWithExpiredPasswords.invalidExpirationDurationForDetection'), t3lib_FlashMessage::ERROR);
 		}
-		
-		if ( t3lib_div::intval_positive( (int) trim($submittedData['expirationUsergroupForDetection'])) > 0 ) {
-			$expirationUsergroupForDetectionIsValid = true;
-		} else {
-			$parentObject->addMessage($GLOBALS['LANG']->sL('LLL:EXT:feuser_passwordexpiration/Resources/Private/Language/locallang_db.xml:schedulerTask.detectUsersWithExpiredPasswords.invalidExpirationUsergroupForDetection'), t3lib_FlashMessage::ERROR);
-		}
 
-		return $expirationDurationForDetectionIsValid && $expirationUsergroupForDetectionIsValid;
+		return $expirationDurationForDetectionIsValid;
 	}
 
 }

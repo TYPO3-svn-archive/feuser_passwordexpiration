@@ -30,6 +30,7 @@ require_once(t3lib_extMgm::extPath('feuserregister') . 'interfaces/interface.tx_
  * NOTE: Use for this class 'tx' instead of 'Tx' in class name
  */
 class tx_FeuserPasswordexpiration_Hooks_UpdateLastPasswordChangeHook implements tx_feuserregister_interface_Observer {
+	
 	/**
 	 * update lastPasswordChange of given user
 	 * 
@@ -39,21 +40,22 @@ class tx_FeuserPasswordexpiration_Hooks_UpdateLastPasswordChangeHook implements 
 	 * @return mixed Whether to cancel further processings
 	 */
 	public function update($event, array $params, tx_feuserregister_interface_Observable $observable) {
-
 		if ($event === 'onEditAfterSave') {
-			
 			$objectManager = t3lib_div::makeInstance ( 'Tx_Extbase_Object_ObjectManager' );
 			$frontendUserRepository = $objectManager->get ( 'Tx_FeuserPasswordexpiration_Domain_Repository_FrontendUserRepository' );
+			$frontendUserGroupRepository = $objectManager->get ( 'Tx_FeuserPasswordexpiration_Domain_Repository_FrontendUserGroupRepository' );
+			
+			$extConf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['feuser_passwordexpiration']);
+			$exiprationUsergroup = $frontendUserGroupRepository->findByUid($extConf['expirationUsergroup']);
 			
 			$frontendUser = $params['feuser'];
 			$user = $frontendUserRepository->findByUid($frontendUser->get('uid'));
 			$user->setLastPasswordChange(time());
+			$user->removeUsergroup($exiprationUsergroup);
 			
 			$persistenceManager = $objectManager->get('Tx_Extbase_Persistence_Manager');
 			$persistenceManager->persistAll();
-
 		}
-
 	}
 
 }

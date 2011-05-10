@@ -36,7 +36,7 @@ class Tx_FeuserPasswordexpiration_Scheduler_DetectUsersWithExpiredPasswordsTask 
 	 * @return string
 	 */
 	public function getAdditionalInformation() {
-		return 'Expiration duration: '.$this->expirationDurationForDetection.'; Expiration usergroup: '.$this->expirationUsergroupForDetection;
+		return 'Expiration duration: '.$this->expirationDurationForDetection;
 	}
 	
 	/**
@@ -50,10 +50,12 @@ class Tx_FeuserPasswordexpiration_Scheduler_DetectUsersWithExpiredPasswordsTask 
 		$frontendUserRepository->updateLastPasswordChangeToCurrentTimestampIfNull();
 		
 		$users = $frontendUserRepository->findUsersWithExpiredPasswords($this->expirationDurationForDetection);
-		$exiprationUserGroup =  $frontendUserGroupRepository->findByUid($this->expirationUsergroupForDetection);
+		
+		$extConf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['feuser_passwordexpiration']);
+		$exiprationUsergroup =  $frontendUserGroupRepository->findByUid($extConf['expirationUsergroup']);
 		
 		foreach ($users as $user) {
-			$user->addUsergroup($exiprationUserGroup);
+			$user->addUsergroup($exiprationUsergroup);
 		}
 		
 		$persistenceManager = $objectManager->get('Tx_Extbase_Persistence_Manager');

@@ -26,7 +26,7 @@
 require_once(t3lib_extMgm::extPath('scheduler').'interfaces/interface.tx_scheduler_additionalfieldprovider.php');
 
 /**
- * class to define the additional field 'expirationDurationForDetection' and 'expirationUsergroupForDetection'
+ * class to define the additional field 'expirationDurationForDeletion'
  */
 class tx_FeuserPasswordexpiration_Scheduler_DeleteUsersWithExpiredPasswordsAdditionalFields implements tx_scheduler_AdditionalFieldProvider {
 	
