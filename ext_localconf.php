@@ -15,6 +15,7 @@ if (TYPO3_MODE == 'BE') {
 	);
 	
 	require_once t3lib_extMgm::extPath($_EXTKEY) . 'Classes/Scheduler/DeleteUsersWithExpiredPasswordsTask.php';
+	require_once t3lib_extMgm::extPath($_EXTKEY) . 'Classes/Scheduler/DeleteUsersWithExpiredPasswordsAdditionalFields.php';
 	$GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['scheduler']['tasks']['Tx_FeuserPasswordexpiration_Scheduler_DeleteUsersWithExpiredPasswordsTask'] = array(
 		'extension' => $_EXTKEY,
 		'title' => 'LLL:EXT:' . $_EXTKEY . '/Resources/Private/Language/locallang_db.xml:schedulerTask.deleteUsersWithExpiredPasswords.name',
