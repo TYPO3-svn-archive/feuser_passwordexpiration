@@ -1,0 +1,2 @@
+# cat=basic; type=int+; label=Expiration usergroup (uid):Defines the usergroup which should be assigned to expired frontend users
+expirationUsergroup = 

@@ -38,6 +38,11 @@ class Tx_FeuserPasswordexpiration_Domain_Model_FrontendUser extends Tx_Extbase_D
 	protected $lastPasswordChange;
 	
 	/**
+	 * @var Tx_Extbase_Persistence_ObjectStorage<Tx_FeuserPasswordexpiration_Domain_Model_FrontendUserGroup>
+	 */
+	protected $usergroup;
+	
+	/**
 	 * Setter for lastPasswordChange
 	 *
 	 * @param integer

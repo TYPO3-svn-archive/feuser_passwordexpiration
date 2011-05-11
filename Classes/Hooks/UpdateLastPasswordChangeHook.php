@@ -50,6 +50,7 @@ class tx_FeuserPasswordexpiration_Hooks_UpdateLastPasswordChangeHook implements 
 			
 			$frontendUser = $params['feuser'];
 			$user = $frontendUserRepository->findByUid($frontendUser->get('uid'));
+			
 			$user->setLastPasswordChange(time());
 			$user->removeUsergroup($exiprationUsergroup);
 			
