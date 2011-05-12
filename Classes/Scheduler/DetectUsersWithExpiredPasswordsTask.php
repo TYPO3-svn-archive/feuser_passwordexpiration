@@ -23,13 +23,25 @@
 *  This copyright notice MUST APPEAR in all copies of the script!
 ***************************************************************/
 
-require_once (t3lib_extMgm::extPath ( 'scheduler' ) . 'class.tx_scheduler_task.php');
-
 /**
  * Frontend users delete task for sheduler
  */
-class Tx_FeuserPasswordexpiration_Scheduler_DetectUsersWithExpiredPasswordsTask extends tx_scheduler_Task {
-	
+class Tx_FeuserPasswordexpiration_Scheduler_DetectUsersWithExpiredPasswordsTask extends Tx_FeuserPasswordexpiration_Scheduler_Task {
+	/**
+	 * detect all users who didn't change their passwords and add them to a defined userGroup
+	 */
+	public function execute() {
+		$this->getFrontendUserRepository()->updateLastPasswordChangeToCurrentTimestampIfNull();
+
+		foreach ($this->getFrontendUserRepository()->findUsersWithExpiredPasswords($this->getExpirationDuration(), $this->getExtensionManager()->getIgnoreFeUsersWithPrefix()) as $user) {
+			$user->addUsergroup( $this->getExiprationUsergroup() );
+		}
+
+		$this->getPersistenceManager()->persistAll();
+
+		return TRUE;
+	}
+
 	/**
 	 * get additional informations, which will be shown inside the scheduler-BE-modul
 	 *
@@ -38,30 +50,21 @@ class Tx_FeuserPasswordexpiration_Scheduler_DetectUsersWithExpiredPasswordsTask 
 	public function getAdditionalInformation() {
 		return 'Expiration duration: '.$this->expirationDurationForDetection;
 	}
-	
-	/**
-	 * deletes all users who didn't change their passwords
-	 */
-	public function execute() {
-		$objectManager = t3lib_div::makeInstance ( 'Tx_Extbase_Object_ObjectManager' );
-		$frontendUserRepository = $objectManager->get ( 'Tx_FeuserPasswordexpiration_Domain_Repository_FrontendUserRepository' );
-		$frontendUserGroupRepository = $objectManager->get ( 'Tx_FeuserPasswordexpiration_Domain_Repository_FrontendUserGroupRepository' );
-		
-		$frontendUserRepository->updateLastPasswordChangeToCurrentTimestampIfNull();
-		
-		$users = $frontendUserRepository->findUsersWithExpiredPasswords($this->expirationDurationForDetection);
-		
-		$extConf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['feuser_passwordexpiration']);
-		$exiprationUsergroup =  $frontendUserGroupRepository->findByUid($extConf['expirationUsergroup']);
-		
-		foreach ($users as $user) {
-			$user->addUsergroup($exiprationUsergroup);
-		}
-		
-		$persistenceManager = $objectManager->get('Tx_Extbase_Persistence_Manager');
-		$persistenceManager->persistAll();
-		
-		return TRUE;
-	}
 
+	/**
+	 * @return Tx_Extbase_Persistence_ObjectStorage<Tx_FeuserPasswordexpiration_Domain_Model_FrontendUserGroup>
+	 */
+	protected function getExiprationUsergroup() {
+		if($this->getExtensionManager()->getExpirationUsergroup() === 0) {
+			throw new RuntimeException( 'expirationUsergroup must be defined in extension-configuration!' );
+		}
+		$frontendUserGroupRepository = $this->getObjectManager()->get ( 'Tx_FeuserPasswordexpiration_Domain_Repository_FrontendUserGroupRepository' );
+		return $frontendUserGroupRepository->findByUid( $this->getExtensionManager()->getExpirationUsergroup() );
+	}
+	/**
+	 * @return integer
+	 */
+	protected function getExpirationDuration() {
+		return $this->expirationDurationForDetection;
+	}
 }

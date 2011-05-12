@@ -36,11 +36,9 @@ class Tx_FeuserPasswordexpiration_Domain_Repository_FrontendUserRepository exten
 	public function updateLastPasswordChangeToCurrentTimestampIfNull() {
 		$query = $this->createQuery ();
 		$query->getQuerySettings()->setRespectStoragePage(FALSE);
-		
 		$query->matching ($query->equals ( 'tx_feuserpasswordexpiration_last_password_change', NULL ));
-		$users = $query->execute();
 		
-		foreach ($users as $user) {
+		foreach ($query->execute() as $user) {
 			$user->setLastPasswordChange(time());
 		}
 	}
@@ -48,16 +46,22 @@ class Tx_FeuserPasswordexpiration_Domain_Repository_FrontendUserRepository exten
 	 * Removes frontend users who didn't change their passwords since given timestamp
 	 *
 	 * @param integer $duration
+	 * @param string $ignoreFeUsersWithPrefix
 	 */
-	public function findUsersWithExpiredPasswords($expirationDuration) {
+	public function findUsersWithExpiredPasswords($expirationDuration, $ignoreFeUsersWithPrefix) {
+		$expirationDate = time() - $expirationDuration;
+
 		$query = $this->createQuery ();
 		$query->getQuerySettings()->setRespectStoragePage(FALSE);
-		
-		$expirationDate = time() - $expirationDuration;
-		
-		$query->matching ($query->lessThan ( 'tx_feuserpasswordexpiration_last_password_change', $expirationDate ));
+
+		$condition1 = $query->lessThan ( 'tx_feuserpasswordexpiration_last_password_change', $expirationDate );
+		$condition2 = $query->like('username', $ignoreFeUsersWithPrefix.'%');
+		if($ignoreFeUsersWithPrefix === '') {
+			$query->matching ( $condition1 );
+		} else {
+			$query->matching ( $query->logicalAnd($condition1, $query->logicalNot($condition2)) );
+		}
 
 		return $query->execute();
 	}
-
 }

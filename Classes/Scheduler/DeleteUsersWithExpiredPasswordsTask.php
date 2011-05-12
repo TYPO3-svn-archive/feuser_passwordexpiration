@@ -23,13 +23,26 @@
 *  This copyright notice MUST APPEAR in all copies of the script!
 ***************************************************************/
 
-require_once (t3lib_extMgm::extPath ( 'scheduler' ) . 'class.tx_scheduler_task.php');
-
 /**
  * Frontend users delete task for sheduler
  */
-class Tx_FeuserPasswordexpiration_Scheduler_DeleteUsersWithExpiredPasswordsTask extends tx_scheduler_Task {
-	
+class Tx_FeuserPasswordexpiration_Scheduler_DeleteUsersWithExpiredPasswordsTask extends Tx_FeuserPasswordexpiration_Scheduler_Task {
+	/**
+	 * deletes all users who didn't change their passwords
+	 */
+	public function execute() {
+		// Updates database field of new users
+		$this->getFrontendUserRepository()->updateLastPasswordChangeToCurrentTimestampIfNull();
+
+		foreach ($this->getFrontendUserRepository()->findUsersWithExpiredPasswords($this->getExpirationDuration(), $this->getExtensionManager()->getIgnoreFeUsersWithPrefix()) as $user) {
+			$this->getFrontendUserRepository()->remove($user);
+		}
+
+		$this->getPersistenceManager()->persistAll();
+
+		return TRUE;
+	}
+
 	/**
 	 * get additional informations, which will be shown inside the scheduler-BE-modul
 	 *
@@ -38,26 +51,11 @@ class Tx_FeuserPasswordexpiration_Scheduler_DeleteUsersWithExpiredPasswordsTask 
 	public function getAdditionalInformation() {
 		return 'Expiration duration: '.$this->expirationDurationForDeletion;
 	}
-	
-	/**
-	 * deletes all users who didn't change their passwords
-	 */
-	public function execute() {
-		$objectManager = t3lib_div::makeInstance ( 'Tx_Extbase_Object_ObjectManager' );
-		$frontendUserRepository = $objectManager->get ( 'Tx_FeuserPasswordexpiration_Domain_Repository_FrontendUserRepository' );
-		
-		// Updates database field of new users
-		$frontendUserRepository->updateLastPasswordChangeToCurrentTimestampIfNull();
-		
-		$usersWithExpiredPasswords = $frontendUserRepository->findUsersWithExpiredPasswords($this->expirationDurationForDeletion);
-		foreach ($usersWithExpiredPasswords as $user) {
-			$frontendUserRepository->remove($user);
-		}
-		
-		$persistenceManager = $objectManager->get('Tx_Extbase_Persistence_Manager');
-		$persistenceManager->persistAll();
-		
-		return TRUE;
-	}
 
+	/**
+	 * @return integer
+	 */
+	protected function getExpirationDuration() {
+		return $this->expirationDurationForDeletion;
+	}
 }
