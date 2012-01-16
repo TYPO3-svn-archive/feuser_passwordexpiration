@@ -48,20 +48,43 @@ class Tx_FeuserPasswordexpiration_Domain_Repository_FrontendUserRepository exten
 	 * @param integer $duration
 	 * @param string $ignoreFeUsersWithPrefix
 	 */
-	public function findUsersWithExpiredPasswords($expirationDuration, $ignoreFeUsersWithPrefix) {
+	public function findUsersWithExpiredPasswords($expirationDuration, $ignoreFeUsersWithPrefix, $expirationGroup) {
 		$expirationDate = time() - $expirationDuration;
 
 		$query = $this->createQuery ();
 		$query->getQuerySettings()->setRespectStoragePage(FALSE);
 
-		$condition1 = $query->lessThan ( 'tx_feuserpasswordexpiration_last_password_change', $expirationDate );
-		$condition2 = $query->like('username', $ignoreFeUsersWithPrefix.'%');
+		$userHasNotChangedPasswordInExpirationDurationCondition = $query->lessThan ( 'tx_feuserpasswordexpiration_last_password_change', $expirationDate );
+		$userHasIgnorePrefixCondition = $query->like('username', $ignoreFeUsersWithPrefix.'%');
+		
 		if($ignoreFeUsersWithPrefix === '') {
-			$query->matching ( $condition1 );
+			$query->matching ($query->logicalAnd($userHasNotChangedPasswordInExpirationDurationCondition));
 		} else {
-			$query->matching ( $query->logicalAnd($condition1, $query->logicalNot($condition2)) );
+			$query->matching (
+				$query->logicalAnd(
+					$userHasNotChangedPasswordInExpirationDurationCondition,
+					$query->logicalNot($userHasIgnorePrefixCondition)
+				)
+			);
 		}
-
-		return $query->execute();
+		
+		// @todo: filter with $query->logicalNot($userIsInExpiredUsersGroupCondition)
+		$users = $query->execute();
+		$usersNotAlreadyInExpiredUsersGroup = array();
+		
+		foreach ($users as $user) {
+			$matched = false;
+			foreach ($user->getUsergroup() as $group) {
+				if ($group->getUid() === $expirationGroup->getUid()) {
+					$matched = true;
+					break;
+				}
+			}
+			if (!$matched) {
+				$usersNotAlreadyInExpiredUsersGroup[] = $user;
+			}
+		}
+		
+		return $usersNotAlreadyInExpiredUsersGroup;
 	}
 }
