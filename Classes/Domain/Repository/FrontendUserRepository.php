@@ -47,8 +47,9 @@ class Tx_FeuserPasswordexpiration_Domain_Repository_FrontendUserRepository exten
 	 *
 	 * @param integer $duration
 	 * @param string $ignoreFeUsersWithPrefix
+	 * @param Tx_Extbase_Persistence_ObjectStorage<Tx_FeuserPasswordexpiration_Domain_Model_FrontendUserGroup>|null $expirationGroup
 	 */
-	public function findUsersWithExpiredPasswords($expirationDuration, $ignoreFeUsersWithPrefix, $expirationGroup) {
+	public function findUsersWithExpiredPasswords($expirationDuration, $ignoreFeUsersWithPrefix, $expirationGroup = null) {
 		$expirationDate = time() - $expirationDuration;
 
 		$query = $this->createQuery ();
@@ -70,6 +71,11 @@ class Tx_FeuserPasswordexpiration_Domain_Repository_FrontendUserRepository exten
 		
 		// @todo: filter with $query->logicalNot($userIsInExpiredUsersGroupCondition)
 		$users = $query->execute();
+		
+		if ($expirationGroup === null) {
+			return $users;
+		}
+		
 		$usersNotAlreadyInExpiredUsersGroup = array();
 		
 		foreach ($users as $user) {

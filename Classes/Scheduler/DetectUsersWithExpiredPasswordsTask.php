@@ -162,6 +162,9 @@ class Tx_FeuserPasswordexpiration_Scheduler_DetectUsersWithExpiredPasswordsTask
 		}
 	}
 	
+	/**
+	 * Initialize object after construction and wakeup from serialization.
+	 */
 	protected function initializeObject() {
 		$this->observers = new Tx_Extbase_Persistence_ObjectStorage();
 		$this->attachGloballyConfiguredObservers();
