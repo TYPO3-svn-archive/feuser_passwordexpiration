@@ -4,6 +4,8 @@ config.tx_extbase.persistence.classes {
             tableName = fe_users
             columns {
             	tx_feuserpasswordexpiration_last_password_change.mapOnProperty = lastPasswordChange
+            	deleted.mapOnProperty = deleted
+            	disable.mapOnProperty = disable
             	usergroup.mapOnProperty = usergroup
             }
         }

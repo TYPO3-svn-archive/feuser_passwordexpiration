@@ -31,35 +31,79 @@
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
 class Tx_FeuserPasswordexpiration_Domain_Model_FrontendUser extends Tx_Extbase_Domain_Model_FrontendUser {
-
 	/**
 	 * @var integer
 	 */
-	protected $lastPasswordChange;
-	
+	protected $deleted;
+	/**
+	 * @var integer
+	 */
+	protected $disable;
+	/**
+	 * @var integer
+	 */
+	protected $lastPasswordChange;	
 	/**
 	 * @var Tx_Extbase_Persistence_ObjectStorage<Tx_FeuserPasswordexpiration_Domain_Model_FrontendUserGroup>
 	 */
 	protected $usergroup;
-	
+
 	/**
-	 * Setter for lastPasswordChange
-	 *
-	 * @param integer
-	 * @return void
+	 * activate user
 	 */
-	public function setLastPasswordChange($lastPasswordChange) {
-		$this->lastPasswordChange = $lastPasswordChange;
+	public function activate() {
+		$this->setDisable( 0 );
+	}
+	/**
+	 * delete user
+	 */
+	public function delete() {
+		$this->setDeleted( 1 );
+	}
+	/**
+	 * disable user
+	 */
+	public function disable() {
+		$this->setDisable( 1 );
 	}
 
 	/**
-	 * Getter for lastPasswordChange
-	 *
+	 * @return integer
+	 */
+	public function getDeleted() {
+		return $this->deleted;
+	}
+	/**
+	 * @return integer
+	 */
+	public function getDisable() {
+		return $this->disable;
+	}
+	/**
 	 * @return integer
 	 */
 	public function getLastPasswordChange() {
 		return $this->lastPasswordChange;
 	}
 
+	/**
+	 * @param integer $deleted
+	 */
+	public function setDeleted($deleted) {
+		$this->deleted = $deleted;
+	}
+	/**
+	 * @param integer $disable
+	 */
+	public function setDisable($disable) {
+		$this->disable = $disable;
+	}
+	/**
+	 * @param integer
+	 * @return void
+	 */
+	public function setLastPasswordChange($lastPasswordChange) {
+		$this->lastPasswordChange = $lastPasswordChange;
+	}
 }
 ?>

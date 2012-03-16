@@ -123,7 +123,8 @@ class Tx_FeuserPasswordexpiration_Scheduler_DetectUsersWithExpiredPasswordsTask
 	 * @return string
 	 */
 	public function getAdditionalInformation() {
-		return 'Expiration duration: '.$this->expirationDurationForDetection;
+		$days  = round( $this->getExpirationDuration() / 86400, 2 );
+		return 'Expiration duration: '.$this->getExpirationDuration().' ('.$days.' days)';
 	}
 	
 	/**
