@@ -24,17 +24,13 @@
 ***************************************************************/
 
 require_once(t3lib_extMgm::extPath('feuserregister') . 'interfaces/interface.tx_feuserregister_interface_observer.php');
+require_once PATH_tx_feuser_passwordexpiration . 'Classes/Hooks/AbstractHook.php';
 
 /**
  * Hook to update lastPasswordChange field in fe_users table on password update
  * NOTE: Use for this class 'tx' instead of 'Tx' in class name
  */
-class tx_FeuserPasswordexpiration_Hooks_UpdateLastPasswordChangeHook implements tx_feuserregister_interface_Observer {
-	/**
-	 * @var Tx_Extbase_Object_ObjectManager
-	 */
-	private $objectManager;
-
+class tx_FeuserPasswordexpiration_Hooks_UpdateLastPasswordChangeHook extends Tx_FeuserPasswordexpiration_Hooks_AbstractHook implements tx_feuserregister_interface_Observer {
 	/**
 	 * update lastPasswordChange of given user
 	 * 
@@ -45,40 +41,10 @@ class tx_FeuserPasswordexpiration_Hooks_UpdateLastPasswordChangeHook implements 
 	 */
 	public function update($event, array $params, tx_feuserregister_interface_Observable $observable) {
 		if ($event === 'onEditAfterSave') {
-			$frontendUser = $params['feuser'];
-			$frontendUserRepository = $this->getObjectManager()->get ( 'Tx_FeuserPasswordexpiration_Domain_Repository_FrontendUserRepository' );
-			$user = $frontendUserRepository->findByUid($frontendUser->get('uid'));
-			$user->setLastPasswordChange( time() );
-			$user->removeUsergroup( $this->getExiprationUsergroup() );
-
-			$persistenceManager = $this->getObjectManager()->get('Tx_Extbase_Persistence_Manager');
-			$persistenceManager->persistAll();
+			$feUserUid = $params['feuser']->get('uid');
+			$this->removeFrontendUserFromExpirationUsergroup( $feUserUid );
+			$this->updateLastPasswordChangeOfFrontendUser( $feUserUid );
+			$this->persistAll();
 		}
-	}
-
-	/**
-	 * @return Tx_Extbase_Persistence_ObjectStorage<Tx_FeuserPasswordexpiration_Domain_Model_FrontendUserGroup>
-	 */
-	protected function getExiprationUsergroup() {
-		if($this->getExtensionManager()->getExpirationUsergroup() === 0) {
-			throw new RuntimeException( 'expirationUsergroup must be defined in extension-configuration!' );
-		}
-		$frontendUserGroupRepository = $this->getObjectManager()->get ( 'Tx_FeuserPasswordexpiration_Domain_Repository_FrontendUserGroupRepository' );
-		return $frontendUserGroupRepository->findByUid( $this->getExtensionManager()->getExpirationUsergroup() );
-	}
-	/**
-	 * @return Tx_FeuserPasswordexpiration_Configuration_ExtensionManager
-	 */
-	protected function getExtensionManager() {
-		return t3lib_div::makeInstance ( 'Tx_FeuserPasswordexpiration_Configuration_ExtensionManager' );
-	}
-	/**
-	 * @return Tx_Extbase_Object_ObjectManager
-	 */
-	protected function getObjectManager() {
-		if($this->objectManager === NULL) {
-			$this->objectManager = t3lib_div::makeInstance ( 'Tx_Extbase_Object_ObjectManager' );
-		}
-		return $this->objectManager;
 	}
 }

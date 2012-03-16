@@ -5,7 +5,7 @@ How to use this extension
 	With this extension, you can define this two things (if FE-user doesn't change his password):
 	- define a duration, after a FE-user will be added to a special FE-usergroup
 	- define a duration, after a FE-user will be deactivated (deleted or hidden)
- 
+
 2) How to configure this extension?
  	2.1) create a FE-usergroup
  	2.2) place a tt_content-element at your homepage, which the FE-user will see, if he logs into the TYPO3-frontend
@@ -20,4 +20,4 @@ How to use this extension
 	     ==> If FE-user hasn't changed his password within the "Expiration duration", than the FE-user will automatically be deactivated (deleted or hidden)
 
 3) Dependencies
-	This extension only works fine, if you use the feuserregister-extension to update passwords of FE-users!
+	This extension only works fine, if you use the feuserregister-extension to update passwords of FE-users (or you write your own Hooks by extending the class Tx_FeuserPasswordexpiration_Hooks_AbstractHook)!
