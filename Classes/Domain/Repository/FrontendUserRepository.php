@@ -31,6 +31,22 @@
  */
 class Tx_FeuserPasswordexpiration_Domain_Repository_FrontendUserRepository extends Tx_Extbase_Domain_Repository_FrontendUserRepository {
 	/**
+	 * Finds an object matching the given identifier.
+	 *
+	 * @param int $uid The identifier of the object to find
+	 * @return object The matching object if found, otherwise NULL
+	 * @api
+	 */
+	public function findByUid($uid) {
+		$query = $this->createQuery();
+		$query->getQuerySettings()->setRespectSysLanguage(FALSE);
+		$query->getQuerySettings()->setRespectStoragePage(FALSE);
+		$query->getQuerySettings()->setRespectEnableFields(FALSE);
+		$query->matching( $query->equals('uid', $uid) );
+		return $query->execute()->getFirst();
+	}
+
+	/**
 	 * Updates the LastPasswordChange field of all feusers to the current timestamp if no timestamp is set
 	 */
 	public function updateLastPasswordChangeToCurrentTimestampIfNull() {

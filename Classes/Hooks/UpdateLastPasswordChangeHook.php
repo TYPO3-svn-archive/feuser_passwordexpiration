@@ -41,9 +41,9 @@ class tx_FeuserPasswordexpiration_Hooks_UpdateLastPasswordChangeHook extends Tx_
 	 */
 	public function update($event, array $params, tx_feuserregister_interface_Observable $observable) {
 		if ($event === 'onEditAfterSave') {
-			$feUserUid = $params['feuser']->get('uid');
-			$this->removeFrontendUserFromExpirationUsergroup( $feUserUid );
-			$this->updateLastPasswordChangeOfFrontendUser( $feUserUid );
+			$this->setFrontendUser( $this->createFrontendUser( $params['feuser']->get('uid') ) );
+			$this->removeFrontendUserFromExpirationUsergroup();
+			$this->updateLastPasswordChangeOfFrontendUser();
 			$this->persistAll();
 		}
 	}

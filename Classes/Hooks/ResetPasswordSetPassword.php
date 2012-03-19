@@ -23,20 +23,23 @@
 *  This copyright notice MUST APPEAR in all copies of the script!
 ***************************************************************/
 
-require_once(t3lib_extMgm::extPath('eft') . 'domain/model/interface.tx_eft_domain_model_observer.php');
+require_once(t3lib_extMgm::extPath('eft') . 'domain/model/observer/interface.tx_eft_domain_model_observer_observer.php');
 require_once PATH_tx_feuser_passwordexpiration . 'Classes/Hooks/AbstractHook.php';
 
 /**
  * Hook to remove FE-user from 'password-expired'-userGroup
  * NOTE: Use for this class 'tx' instead of 'Tx' in class name
  */
-class tx_FeuserPasswordexpiration_Hooks_ResetPasswordSetPassword extends Tx_FeuserPasswordexpiration_Hooks_AbstractHook implements tx_eft_domain_model_observer {
+class tx_FeuserPasswordexpiration_Hooks_ResetPasswordSetPassword extends Tx_FeuserPasswordexpiration_Hooks_AbstractHook implements tx_eft_domain_model_observer_observer {
 	/**
-	 * @param array $params
+	 * update fe-user
+	 * @param tx_eft_domain_model_observer_subject $subject
 	 */
-	public function update(array $params) {
-		$this->removeFrontendUserFromExpirationUsergroup( $params['feUserUid'] );
-		$this->updateLastPasswordChangeOfFrontendUser( $params['feUserUid'] );
+	public function update(tx_eft_domain_model_observer_subject $subject) {
+		$params = $subject->getParams();
+		$this->setFrontendUser( $this->createFrontendUser( $params['feUserId'] ) );
+		$this->removeFrontendUserFromExpirationUsergroup();
+		$this->updateLastPasswordChangeOfFrontendUser();
 		$this->persistAll();
 	}
 }

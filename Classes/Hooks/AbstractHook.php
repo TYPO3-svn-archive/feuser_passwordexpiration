@@ -32,6 +32,10 @@ abstract class Tx_FeuserPasswordexpiration_Hooks_AbstractHook {
 	 */
 	private $extensionManager;
 	/**
+	 * @var Tx_FeuserPasswordexpiration_Domain_Model_FrontendUser
+	 */
+	private $frontendUser;
+	/**
 	 * @var Tx_Extbase_Object_ObjectManager
 	 */
 	private $objectManager;
@@ -50,6 +54,20 @@ abstract class Tx_FeuserPasswordexpiration_Hooks_AbstractHook {
 	}
 
 	/**
+	 * activate frontend-user
+	 */
+	protected function activateFrontendUser() {
+		$this->getFrontendUser()->activate();
+	}
+	/**
+	 * @param integer $feUserUid
+	 * @return Tx_FeuserPasswordexpiration_Domain_Model_FrontendUser
+	 */
+	protected function createFrontendUser($feUserUid) {
+		$repository = $this->getObjectManager()->get ( 'Tx_FeuserPasswordexpiration_Domain_Repository_FrontendUserRepository' );
+		return $repository->findByUid( $feUserUid );
+	}
+	/**
 	 * persist all changes
 	 */
 	protected function persistAll() {
@@ -57,19 +75,21 @@ abstract class Tx_FeuserPasswordexpiration_Hooks_AbstractHook {
 	}
 	/**
 	 * remove FE-user from expiration-usergroup
-	 * 
-	 * @param integer $feUserUid
 	 */
-	protected function removeFrontendUserFromExpirationUsergroup($feUserUid) {
-		$this->getFrontendUser($feUserUid)->removeUsergroup( $this->getExpirationUsergroup() );
+	protected function removeFrontendUserFromExpirationUsergroup() {
+		$this->getFrontendUser()->removeUsergroup( $this->getExpirationUsergroup() );
+	}
+	/**
+	 * @param Tx_FeuserPasswordexpiration_Domain_Model_FrontendUser $frontendUser
+	 */
+	protected function setFrontendUser(Tx_FeuserPasswordexpiration_Domain_Model_FrontendUser $frontendUser) {
+		$this->frontendUser = $frontendUser;
 	}
 	/**
 	 * update field, which defines the timestamp of last password-change
-	 * 
-	 * @param integer $feUserUid
 	 */
-	protected function updateLastPasswordChangeOfFrontendUser($feUserUid) {
-		$this->getFrontendUser($feUserUid)->setLastPasswordChange( time() );
+	protected function updateLastPasswordChangeOfFrontendUser() {
+		$this->getFrontendUser()->setLastPasswordChange( time() );
 	}
 
 	/**
@@ -95,12 +115,10 @@ abstract class Tx_FeuserPasswordexpiration_Hooks_AbstractHook {
 		return $this->extensionManager;
 	}
 	/**
-	 * @param integer $feUserUid
 	 * @return Tx_FeuserPasswordexpiration_Domain_Model_FrontendUser
 	 */
-	private function getFrontendUser($feUserUid) {
-		$repository = $this->getObjectManager()->get ( 'Tx_FeuserPasswordexpiration_Domain_Repository_FrontendUserRepository' );
-		return $repository->findByUid( $feUserUid );
+	private function getFrontendUser() {
+		return $this->frontendUser;
 	}
 	/**
 	 * @return Tx_Extbase_Object_ObjectManager
