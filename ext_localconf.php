@@ -38,9 +38,14 @@ if (TYPO3_MODE == 'BE') {
 }
 
 /**
- * register hooks to update lastPasswordChange field and/or remove expiration-UserGroup from FE-User
+ * register hooks of feuserregister-extension to update lastPasswordChange field and/or remove expiration-UserGroup from FE-User
  */
 $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['tx_feuserregister']['addObserver'][] = 'EXT:'.$_EXTKEY.'/Classes/Hooks/UpdateLastPasswordChangeHook.php:tx_FeuserPasswordexpiration_Hooks_UpdateLastPasswordChangeHook';
-$GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['tx_eft']['resetPassword_sendRequest']['observers'][] = 'EXT:'.$_EXTKEY.'/Classes/Hooks/ResetPasswordSendRequest.php:tx_FeuserPasswordexpiration_Hooks_ResetPasswordSendRequest';
-$GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['tx_eft']['resetPassword_setPassword']['observers'][] = 'EXT:'.$_EXTKEY.'/Classes/Hooks/ResetPasswordSetPassword.php:tx_FeuserPasswordexpiration_Hooks_ResetPasswordSetPassword';
+
+/**
+ * register hooks of eft-extension to update lastPasswordChange field and/or remove expiration-UserGroup from FE-User
+ */
+require_once(PATH_tx_feuser_passwordexpiration . 'Classes/Hooks/ResetPassword.php');
+$GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['tx_eft']['resetPassword_sendRequest'][] = 'tx_FeuserPasswordexpiration_Hooks_ResetPassword->sendRequest';
+$GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['tx_eft']['resetPassword_setPassword'][] = 'tx_FeuserPasswordexpiration_Hooks_ResetPassword->setPassword';
 ?>

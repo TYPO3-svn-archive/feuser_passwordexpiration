@@ -23,20 +23,32 @@
 *  This copyright notice MUST APPEAR in all copies of the script!
 ***************************************************************/
 
-require_once(t3lib_extMgm::extPath('eft') . 'domain/model/observer/interface.tx_eft_domain_model_observer_observer.php');
 require_once PATH_tx_feuser_passwordexpiration . 'Classes/Hooks/AbstractHook.php';
 
 /**
- * Hook to remove FE-user from 'password-expired'-userGroup
+ * Hook to update lastPasswordChange field in fe_users table
  * NOTE: Use for this class 'tx' instead of 'Tx' in class name
  */
-class tx_FeuserPasswordexpiration_Hooks_ResetPasswordSetPassword extends Tx_FeuserPasswordexpiration_Hooks_AbstractHook implements tx_eft_domain_model_observer_observer {
+class tx_FeuserPasswordexpiration_Hooks_ResetPassword extends Tx_FeuserPasswordexpiration_Hooks_AbstractHook {
 	/**
-	 * update fe-user
-	 * @param tx_eft_domain_model_observer_subject $subject
+	 * update fe-user on sendRequest
+	 * 
+	 * @param array $params
+	 * @param tx_eft_domain_service_passwordReset $ref
 	 */
-	public function update(tx_eft_domain_model_observer_subject $subject) {
-		$params = $subject->getParams();
+	public function sendRequest(array $params, $ref) {
+		$this->setFrontendUser( $this->createFrontendUser( $params['feUserId'] ) );
+		$this->activateFrontendUser();
+		$this->updateLastPasswordChangeOfFrontendUser();
+		$this->persistAll();
+	}
+	/**
+	 * update fe-user on setPassword
+	 * 
+	 * @param array $params
+	 * @param tx_eft_controller_resetPassword $ref
+	 */
+	public function setPassword(array $params, $ref) {
 		$this->setFrontendUser( $this->createFrontendUser( $params['feUserId'] ) );
 		$this->removeFrontendUserFromExpirationUsergroup();
 		$this->updateLastPasswordChangeOfFrontendUser();
