@@ -34,9 +34,8 @@ class tx_FeuserPasswordexpiration_Hooks_ResetPassword extends Tx_FeuserPassworde
 	 * update fe-user on sendRequest
 	 * 
 	 * @param array $params
-	 * @param tx_eft_domain_service_passwordReset $ref
 	 */
-	public function sendRequest(array $params, $ref) {
+	public function sendRequest(array $params) {
 		$this->setFrontendUser( $this->createFrontendUser( $params['feUserId'] ) );
 		$this->activateFrontendUser();
 		$this->updateLastPasswordChangeOfFrontendUser();
@@ -46,9 +45,8 @@ class tx_FeuserPasswordexpiration_Hooks_ResetPassword extends Tx_FeuserPassworde
 	 * update fe-user on setPassword
 	 * 
 	 * @param array $params
-	 * @param tx_eft_controller_resetPassword $ref
 	 */
-	public function setPassword(array $params, $ref) {
+	public function setPassword(array $params) {
 		$this->setFrontendUser( $this->createFrontendUser( $params['feUserId'] ) );
 		$this->removeFrontendUserFromExpirationUsergroup();
 		$this->updateLastPasswordChangeOfFrontendUser();

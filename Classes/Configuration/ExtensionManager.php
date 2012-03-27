@@ -19,7 +19,7 @@ class Tx_FeuserPasswordexpiration_Configuration_ExtensionManager implements t3li
 	private $configuration=array();
 
 	/**
-	 * constructor - loading the current localconf configuration for eft extension
+	 * constructor - loading the current localconf configuration for the extension
 	 *
 	 */
 	public function __construct() {
