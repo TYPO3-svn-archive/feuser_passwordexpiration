@@ -19,5 +19,11 @@ How to use this extension
 	2.5) configure scheduler-task "Deactivate users with expired passwords (feuser_passwordexpiration)" and define the "Expiration duration" and the "Deactivation-Type"
 	     ==> If FE-user hasn't changed his password within the "Expiration duration", than the FE-user will automatically be deactivated (deleted or hidden)
 
-3) Dependencies
+3) How to reset expired FE-User?
+	3.1) Go to BE-Module 'Functions'
+	3.2) Select the Sys-Folder, where your (expired) FE-User are stored
+	3.3) Select Option 'Reset Expired FrontendUser'
+	3.4) Click on button 'Reset Expired FrontendUser'
+
+4) Dependencies
 	This extension only works fine, if you use the feuserregister-extension to update passwords of FE-users (or you write your own Hooks by extending the class Tx_FeuserPasswordexpiration_Hooks_AbstractHook)!

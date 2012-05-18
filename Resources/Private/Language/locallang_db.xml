@@ -6,6 +6,10 @@
 	</meta>
 	<data type="array">
 		<languageKey index="default" type="array">
+			<label index="moduleFunction.ResetExpiredFrontendUser">Reset Expired FrontendUser</label>
+			<label index="moduleFunction.ResetExpiredFrontendUser.resetExpiredFrontendUser">Reset Expired FrontendUser</label>
+			<label index="moduleFunction.ResetExpiredFrontendUser.expiredFrontendUserReset">%d expired FrontendUser have been reset</label>
+			<label index="moduleFunction.ResetExpiredFrontendUser.noExpiredFrontendUserFound">No expired FrontendUser found</label>
 			<label index="schedulerTask.detectUsersWithExpiredPasswords.name">Detect users with expired passwords</label>
 			<label index="schedulerTask.detectUsersWithExpiredPasswords.description">Adds definied usergoup to users with expired password</label>
 			<label index="schedulerTask.detectUsersWithExpiredPasswords.invalidExpirationDurationForDetection">Invalid expiration duration</label>

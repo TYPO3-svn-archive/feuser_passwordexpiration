@@ -85,17 +85,28 @@ class Tx_FeuserPasswordexpiration_Domain_Repository_FrontendUserRepository exten
 			);
 		}
 
-		return $this->filterUsersAreNotInExpiredUsersGroup($query->execute(), $expirationGroup);
+		return $this->filterUsersByExpiredUsersGroup($query->execute(), $expirationGroup, FALSE);
+	}
+	/**
+	 * @param Tx_Extbase_Persistence_ObjectStorage<Tx_FeuserPasswordexpiration_Domain_Model_FrontendUserGroup> $expirationGroup
+	 * @param integer $pageUid
+	 */
+	public function findUsersWhichContainToExpirationGroup(Tx_FeuserPasswordexpiration_Domain_Model_FrontendUserGroup $expirationGroup, $pageUid) {
+		$query = $this->createQuery ();
+		$query->getQuerySettings()->setStoragePageIds ( array ($pageUid) );
+
+		return $this->filterUsersByExpiredUsersGroup($query->execute(), $expirationGroup, TRUE);
 	}
 
 	/**
-	 * return only users, which are not in expired-usersGroup
+	 * return only users, which belong OR not belong to expired-usersGroup
 	 * 
 	 * @param Tx_Extbase_Persistence_QueryResultInterface $users
 	 * @param Tx_FeuserPasswordexpiration_Domain_Model_FrontendUserGroup|null $expirationGroup
+	 * @param boolean $userMustBelongToExpiredGroup
 	 * @return array
 	 */
-	private function filterUsersAreNotInExpiredUsersGroup(Tx_Extbase_Persistence_QueryResultInterface $users, Tx_FeuserPasswordexpiration_Domain_Model_FrontendUserGroup $expirationGroup = null) {
+	private function filterUsersByExpiredUsersGroup(Tx_Extbase_Persistence_QueryResultInterface $users, Tx_FeuserPasswordexpiration_Domain_Model_FrontendUserGroup $expirationGroup = null, $userMustBelongToExpiredGroup) {
 		if ($expirationGroup === null) {
 			return $users;
 		}
@@ -103,14 +114,14 @@ class Tx_FeuserPasswordexpiration_Domain_Repository_FrontendUserRepository exten
 		/* @var $user Tx_FeuserPasswordexpiration_Domain_Model_FrontendUser */
 		$filteredUsers = array();
 		foreach ($users as $user) {
-			$matched = false;
+			$userBelongToExpiredGroup = FALSE;
 			foreach ($user->getUsergroup() as $group) {
 				if ($group->getUid() === $expirationGroup->getUid()) {
-					$matched = true;
+					$userBelongToExpiredGroup = TRUE;
 					break;
 				}
 			}
-			if (!$matched) {
+			if ($userBelongToExpiredGroup === $userMustBelongToExpiredGroup) {
 				$filteredUsers[] = $user;
 			}
 		}

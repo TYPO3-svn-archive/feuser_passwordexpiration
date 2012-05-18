@@ -18,6 +18,7 @@ define ( 'PATH_tx_feuser_passwordexpiration', t3lib_extMgm::extPath ( $_EXTKEY )
  * register scheduer-tasks
  */
 if (TYPO3_MODE == 'BE') {
+	// configure scheduler-tasks
 	require_once PATH_tx_feuser_passwordexpiration . 'Classes/Scheduler/DetectUsersWithExpiredPasswordsTask.php';
 	require_once PATH_tx_feuser_passwordexpiration . 'Classes/Scheduler/DetectUsersWithExpiredPasswordsAdditionalFields.php';
 	$GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['scheduler']['tasks']['Tx_FeuserPasswordexpiration_Scheduler_DetectUsersWithExpiredPasswordsTask'] = array(
