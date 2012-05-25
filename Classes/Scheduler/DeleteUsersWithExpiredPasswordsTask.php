@@ -23,7 +23,7 @@
 *  This copyright notice MUST APPEAR in all copies of the script!
 ***************************************************************/
 
-require_once PATH_tx_feuser_passwordexpiration . 'Classes/Scheduler/DeleteUsersWithExpiredPasswordsAdditionalFields.php';
+require_once t3lib_extMgm::extPath ( 'feuser_passwordexpiration' ) . 'Classes/Scheduler/DeleteUsersWithExpiredPasswordsAdditionalFields.php';
 
 /**
  * Frontend users delete task for sheduler
