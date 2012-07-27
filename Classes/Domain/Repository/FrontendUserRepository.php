@@ -47,45 +47,66 @@ class Tx_FeuserPasswordexpiration_Domain_Repository_FrontendUserRepository exten
 	}
 
 	/**
-	 * Updates the LastPasswordChange field of all feusers to the current timestamp if no timestamp is set
+	 * Updates the LastPasswordChange field of all feusers (with an email) to the current timestamp if no timestamp is set
 	 */
 	public function updateLastPasswordChangeToCurrentTimestampIfNull() {
 		$query = $this->createQuery ();
 		$query->getQuerySettings()->setRespectStoragePage(FALSE);
-		$query->matching ($query->equals ( 'tx_feuserpasswordexpiration_last_password_change', NULL ));
 		
+		$ignoreUsersWithoutEmailConstraint = $query->logicalNot($query->equals('email', ''));
+		$onlyUsersWithoutTimestampConstraint = $query->equals ( 'tx_feuserpasswordexpiration_last_password_change', NULL );
+		
+		$query->matching ($query->logicalAnd($ignoreUsersWithoutEmailConstraint, $onlyUsersWithoutTimestampConstraint));
+		
+		$time = $this->getTime();
 		foreach ($query->execute() as $user) {
-			$user->setLastPasswordChange(time());
+			$user->setLastPasswordChange($time);
 		}
+	}
+	/**
+	 * @return int
+	 */
+	protected function getTime() {
+		return time();
+	}
+	/**
+	 * @param int $expirationDuration
+	 * @param string $ignoreFeUsersWithPrefix
+	 * @param Tx_FeuserPasswordexpiration_Domain_Model_FrontendUserGroup $expirationGroup
+	 * @return Tx_Extbase_Persistence_QueryResultInterface
+	 */
+	public function findUsersWithExpiredPasswordsNotInExpiredUsersGroup($expirationDuration, $ignoreFeUsersWithPrefix, Tx_FeuserPasswordexpiration_Domain_Model_FrontendUserGroup $expirationGroup) {
+		$users = $this->findUsersWithExpiredPasswords($expirationDuration, $ignoreFeUsersWithPrefix);
+		
+		return $this->filterUsersByExpiredUsersGroup($users, $expirationGroup, FALSE);
 	}
 	/**
 	 * Removes frontend users who didn't change their passwords since given timestamp
 	 *
-	 * @param integer $duration
+	 * @param integer $expirationDuration
 	 * @param string $ignoreFeUsersWithPrefix
-	 * @param Tx_Extbase_Persistence_ObjectStorage<Tx_FeuserPasswordexpiration_Domain_Model_FrontendUserGroup>|null $expirationGroup
+	 * @return Tx_Extbase_Persistence_QueryResultInterface
 	 */
-	public function findUsersWithExpiredPasswords($expirationDuration, $ignoreFeUsersWithPrefix, $expirationGroup = null) {
+	public function findUsersWithExpiredPasswords($expirationDuration, $ignoreFeUsersWithPrefix) {
+		$constraints = array();
 		$expirationDate = time() - $expirationDuration;
 
 		$query = $this->createQuery ();
 		$query->getQuerySettings()->setRespectStoragePage(FALSE);
 
-		$userHasNotChangedPasswordInExpirationDurationCondition = $query->lessThan ( 'tx_feuserpasswordexpiration_last_password_change', $expirationDate );
-		$userHasIgnorePrefixCondition = $query->like('username', $ignoreFeUsersWithPrefix.'%');
-
-		if($ignoreFeUsersWithPrefix === '') {
-			$query->matching ($query->logicalAnd($userHasNotChangedPasswordInExpirationDurationCondition));
-		} else {
-			$query->matching (
-				$query->logicalAnd(
-					$userHasNotChangedPasswordInExpirationDurationCondition,
-					$query->logicalNot($userHasIgnorePrefixCondition)
-				)
-			);
+		$ignoreUsersWithoutEmailConstraint = $query->logicalNot($query->equals('email', ''));
+		$ignoreUsersWithUpdatedPasswordConstraint = $query->lessThan ( 'tx_feuserpasswordexpiration_last_password_change', $expirationDate );
+		$constraints[] = $ignoreUsersWithoutEmailConstraint;
+		$constraints[] = $ignoreUsersWithUpdatedPasswordConstraint;
+		
+		if ($ignoreFeUsersWithPrefix !== '') {
+			$ignoreUsersWithPrefixConstraint = $query->logicalNot($query->like('username', $ignoreFeUsersWithPrefix.'%'));
+			$constraints[] = $ignoreUsersWithPrefixConstraint;
 		}
-
-		return $this->filterUsersByExpiredUsersGroup($query->execute(), $expirationGroup, FALSE);
+		
+		$query->matching ($query->logicalAnd($constraints));
+		
+		return $query->execute();
 	}
 	/**
 	 * @param Tx_Extbase_Persistence_ObjectStorage<Tx_FeuserPasswordexpiration_Domain_Model_FrontendUserGroup> $expirationGroup
@@ -106,11 +127,7 @@ class Tx_FeuserPasswordexpiration_Domain_Repository_FrontendUserRepository exten
 	 * @param boolean $userMustBelongToExpiredGroup
 	 * @return array
 	 */
-	private function filterUsersByExpiredUsersGroup(Tx_Extbase_Persistence_QueryResultInterface $users, Tx_FeuserPasswordexpiration_Domain_Model_FrontendUserGroup $expirationGroup = null, $userMustBelongToExpiredGroup) {
-		if ($expirationGroup === null) {
-			return $users;
-		}
-
+	private function filterUsersByExpiredUsersGroup(Tx_Extbase_Persistence_QueryResultInterface $users, Tx_FeuserPasswordexpiration_Domain_Model_FrontendUserGroup $expirationGroup, $userMustBelongToExpiredGroup) {
 		/* @var $user Tx_FeuserPasswordexpiration_Domain_Model_FrontendUser */
 		$filteredUsers = array();
 		foreach ($users as $user) {

@@ -35,9 +35,14 @@ class Tx_FeuserPasswordexpiration_Scheduler_DeleteUsersWithExpiredPasswordsTask 
 	public function execute() {
 		// Updates database field of new users
 		$this->getFrontendUserRepository()->updateLastPasswordChangeToCurrentTimestampIfNull();
-
+		
+		$users = $this->getFrontendUserRepository()->findUsersWithExpiredPasswords(
+			$this->getExpirationDuration(),
+			$this->getExtensionManager()->getIgnoreFeUsersWithPrefix()
+		);
+		
 		// deactivate users
-		foreach ($this->getFrontendUserRepository()->findUsersWithExpiredPasswords($this->getExpirationDuration(), $this->getExtensionManager()->getIgnoreFeUsersWithPrefix()) as $user) {
+		foreach ($users as $user) {
 			if($this->getDeactivationType() === tx_FeuserPasswordexpiration_Scheduler_DeleteUsersWithExpiredPasswordsAdditionalFields::DEACTIVATION_TYPE_HIDE) {
 				$user->disable();
 			} else {
@@ -45,7 +50,17 @@ class Tx_FeuserPasswordexpiration_Scheduler_DeleteUsersWithExpiredPasswordsTask 
 			}
 		}
 
-		$this->getPersistenceManager()->persistAll();
+		try {
+			$this->getPersistenceManager()->persistAll();
+		} catch (Exception $e) {
+			$this->log(
+				sprintf('Could not persist %d users: "%s"', count($users), $e->getMessage()),
+				'feuser_passwordexpiration',
+				t3lib_div::SYSLOG_SEVERITY_ERROR
+			);
+			
+			return FALSE;
+		}
 
 		return TRUE;
 	}

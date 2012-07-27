@@ -58,22 +58,34 @@ class Tx_FeuserPasswordexpiration_Scheduler_DetectUsersWithExpiredPasswordsTask
 	 * detect all users who didn't change their passwords and add them to a defined userGroup
 	 */
 	public function execute() {
+		$expirationUserGroup = $this->getExiprationUsergroup();
 		$this->getFrontendUserRepository()->updateLastPasswordChangeToCurrentTimestampIfNull();
-		$this->users = $this->getFrontendUserRepository()->findUsersWithExpiredPasswords(
+		$this->users = $this->getFrontendUserRepository()->findUsersWithExpiredPasswordsNotInExpiredUsersGroup(
 			$this->getExpirationDuration(),
 			$this->getExtensionManager()->getIgnoreFeUsersWithPrefix(),
-			$this->getExiprationUsergroup()
+			$expirationUserGroup
 		);
 		
-		t3lib_div::devLog(sprintf('Found %d users with expired password.', count($this->users)), 'feuser_passwordexpiration', t3lib_div::SYSLOG_SEVERITY_INFO);
+		$this->log(sprintf('Found %d users with expired password.', count($this->users)), 'feuser_passwordexpiration');
 		
 		if (count($this->users) > 0) {
 			foreach ($this->users as $user) {
-				$user->addUsergroup( $this->getExiprationUsergroup() );
+				$user->addUsergroup( $expirationUserGroup );
 			}
-	
-			$this->getPersistenceManager()->persistAll();
+			
 			$this->notify();
+		}
+		
+		try {
+			$this->getPersistenceManager()->persistAll();
+		} catch (Exception $e) {
+			$this->log(
+				sprintf('Could not persist %d users: "%s"', count($this->users), $e->getMessage()),
+				'feuser_passwordexpiration',
+				t3lib_div::SYSLOG_SEVERITY_ERROR
+			);
+			
+			return FALSE;
 		}
 
 		return TRUE;
