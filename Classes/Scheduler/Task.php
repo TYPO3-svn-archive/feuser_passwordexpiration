@@ -68,4 +68,13 @@ abstract class Tx_FeuserPasswordexpiration_Scheduler_Task extends tx_scheduler_T
 	protected function getPersistenceManager() {
 		return $this->getObjectManager()->get('Tx_Extbase_Persistence_Manager');
 	}
+	
+	/**
+	 * @param string $message
+	 * @param label $label
+	 * @param int $severity
+	 */
+	protected function log($message, $label, $severity = t3lib_div::SYSLOG_SEVERITY_INFO) {
+		t3lib_div::devLog($message, $label, $severity);
+	}
 }

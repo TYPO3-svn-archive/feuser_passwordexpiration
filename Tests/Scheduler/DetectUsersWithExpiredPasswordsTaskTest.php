@@ -11,7 +11,7 @@ class Tx_FeuserPasswordexpiration_Scheduler_DetectUsersWithExpiredPasswordsTaskT
 	protected $globalExtensionConfigurationBackup;
 	
 	/**
-	 * @var Tx_Extbase_Domain_Model_FrontendUserGroup
+	 * @var Tx_FeuserPasswordexpiration_Domain_Model_FrontendUserGroup
 	 */
 	protected $expirationUserGroup;
 	
@@ -30,7 +30,7 @@ class Tx_FeuserPasswordexpiration_Scheduler_DetectUsersWithExpiredPasswordsTaskT
 		$this->unsetGloballyConfiguredObservers();
 		
 		$this->userRepository = $this->getMock('Tx_FeuserPasswordexpiration_Domain_Repository_FrontendUserRepository');
-		$this->expirationUserGroup = new Tx_Extbase_Domain_Model_FrontendUserGroup('a group object for expired users');
+		$this->expirationUserGroup = new Tx_FeuserPasswordexpiration_Domain_Model_FrontendUserGroup('a group object for expired users');
 		
 		// @todo: fix spelling errors in method names
 		$this->task = $this->getMock(
@@ -63,7 +63,7 @@ class Tx_FeuserPasswordexpiration_Scheduler_DetectUsersWithExpiredPasswordsTaskT
 		$jane = $this->getMock('Tx_FeuserPasswordexpiration_Domain_Model_FrontendUser');
 		
 		$this->userRepository->expects($this->any())
-			->method('findUsersWithExpiredPasswords')
+			->method('findUsersWithExpiredPasswordsNotInExpiredUsersGroup')
 			->will($this->returnValue(array($john, $jane)));
 			
 		$this->task->attach($this->getMockObserver());
@@ -80,7 +80,7 @@ class Tx_FeuserPasswordexpiration_Scheduler_DetectUsersWithExpiredPasswordsTaskT
 		$jane->expects($this->once())->method('addUsergroup')->with(clone $this->expirationUserGroup);
 		
 		$this->userRepository->expects($this->any())
-			->method('findUsersWithExpiredPasswords')
+			->method('findUsersWithExpiredPasswordsNotInExpiredUsersGroup')
 			->will($this->returnValue(array($john, $jane)));
 		
 		$this->task->attach($this->getMockObserver());

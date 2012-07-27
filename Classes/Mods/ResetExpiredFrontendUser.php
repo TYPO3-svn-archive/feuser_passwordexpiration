@@ -135,9 +135,11 @@ class Tx_FeuserPasswordexpiration_Mods_ResetExpiredFrontendUser extends t3lib_ex
 		if (isset($action['resetExpiredFrontendUser'])) {
 			$expiredUsers = $this->getFrontendUserRepository()->findUsersWhichContainToExpirationGroup( $this->getExiprationUsergroup(), $this->getPageId() );
 			if(count($expiredUsers) > 0) {
+				$group = $this->getExiprationUsergroup();
+				$time = time();
 				foreach ($expiredUsers as $expiredUser) {
-					$expiredUser->removeUsergroup( $this->getExiprationUsergroup() );
-					$expiredUser->setLastPasswordChange( time() );
+					$expiredUser->removeUsergroup( $group );
+					$expiredUser->setLastPasswordChange( $time );
 				}
 				$this->getPersistenceManager()->persistAll();
 				$infoMessage = sprintf($this->getLabel('expiredFrontendUserReset'), count($expiredUsers));
