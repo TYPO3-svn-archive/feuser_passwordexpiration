@@ -14,6 +14,13 @@ if (!defined ('TYPO3_MODE')) {
 }
 define ( 'PATH_tx_feuser_passwordexpiration', t3lib_extMgm::extPath ( $_EXTKEY ) );
 
+
+// add TypoScript (we must add it ALLWAYS, otherwise the scheduler-tasks will fail!)
+t3lib_extMgm::addTypoScriptSetup(
+	file_get_contents(PATH_tx_feuser_passwordexpiration . 'Configuration/TypoScript/setup.txt')
+);
+
+
 /**
  * register scheduer-tasks
  */

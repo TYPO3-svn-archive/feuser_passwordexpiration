@@ -3,8 +3,6 @@ if (!defined ('TYPO3_MODE')) {
 	die ('Access denied.');
 }
 
-t3lib_extMgm::addStaticFile($_EXTKEY, 'Configuration/TypoScript', 'Frontend User Password Expiration');
-
 
 // configure BE-module (as web-function) to reset expired frontend-user
 if (TYPO3_MODE == 'BE') {
